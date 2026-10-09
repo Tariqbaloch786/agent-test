@@ -61,7 +61,6 @@ describe('createCharge', () => {
         source: 'tok_visa',
         capture: true,
         receipt_email: 'buyer@example.com',
-        destination: { account: 'acct_123' },
         description: 'agent-test order',
       },
     });
