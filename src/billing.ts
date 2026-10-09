@@ -42,13 +42,13 @@ export async function getPaymentIntent(paymentIntentId: string): Promise<Payment
 }
 
 /** True once any charge created by the payment intent succeeded. */
-export function isPaymentSettled(intent: PaymentIntent): boolean {
-  return intent.charges.data.some((charge) => charge.status === 'succeeded');
+export function isPaymentSettled(charges: Charge[]): boolean {
+  return charges.some((charge) => charge.status === 'succeeded');
 }
 
 /** True while a charge is still pending (bank debits can take days). */
-export function hasPendingCharge(intent: PaymentIntent): boolean {
-  return intent.charges.data.some((charge) => charge.status === 'pending');
+export function hasPendingCharge(charges: Charge[]): boolean {
+  return charges.some((charge) => charge.status === 'pending');
 }
 
 /** Total captured across charges, in cents. */

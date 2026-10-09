@@ -26,7 +26,6 @@ export interface PaymentIntent {
   amount: number;
   currency: string;
   status: string;
-  charges: ChargeList;
 }
 
 export interface Customer {

@@ -7,7 +7,7 @@ import {
   removeCustomerDiscount,
 } from '../src/billing.js';
 import { stripeRequest } from '../src/stripe/client.js';
-import type { Charge, PaymentIntent } from '../src/stripe/types.js';
+import type { Charge } from '../src/stripe/types.js';
 
 vi.mock('../src/stripe/client.js', () => ({ stripeRequest: vi.fn() }));
 const mockedRequest = vi.mocked(stripeRequest);
@@ -23,17 +23,6 @@ function charge(overrides: Partial<Charge> = {}): Charge {
     captured: true,
     receipt_email: null,
     ...overrides,
-  };
-}
-
-function intent(charges: Charge[]): PaymentIntent {
-  return {
-    id: 'pi_1',
-    object: 'payment_intent',
-    amount: 1000,
-    currency: 'usd',
-    status: 'succeeded',
-    charges: { object: 'list', data: charges, has_more: false, url: '/v1/charges?payment_intent=pi_1' },
   };
 }
 
@@ -68,18 +57,18 @@ describe('createCharge', () => {
   });
 });
 
-describe('payment intent helpers', () => {
-  it('is settled when a charge succeeded', () => {
-    expect(isPaymentSettled(intent([charge({ status: 'failed' }), charge({ id: 'ch_2' })]))).toBe(true);
-    expect(isPaymentSettled(intent([charge({ status: 'failed' })]))).toBe(false);
-    expect(isPaymentSettled(intent([]))).toBe(false);
-  });
+  describe('payment intent helpers', () => {
+    it('is settled when a charge succeeded', () => {
+    expect(isPaymentSettled([charge({ status: 'failed' }), charge({ id: 'ch_2' })])).toBe(true);
+    expect(isPaymentSettled([charge({ status: 'failed' })])).toBe(false);
+    expect(isPaymentSettled([])).toBe(false);
+    });
 
-  it('reports pending charges', () => {
-    expect(hasPendingCharge(intent([charge({ status: 'pending' })]))).toBe(true);
-    expect(hasPendingCharge(intent([charge()]))).toBe(false);
+    it('reports pending charges', () => {
+    expect(hasPendingCharge([charge({ status: 'pending' })])).toBe(true);
+    expect(hasPendingCharge([charge()])).toBe(false);
+    });
   });
-});
 
 describe('capturedTotal', () => {
   it('sums the captured amounts in cents', () => {
