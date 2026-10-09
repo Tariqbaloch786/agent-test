@@ -22,7 +22,6 @@ export async function createCharge(input: NewCharge): Promise<Charge> {
       source: input.source,
       capture: true,
       receipt_email: input.receiptEmail,
-      destination: input.destinationAccount ? { account: input.destinationAccount } : undefined,
       description: 'agent-test order',
     },
   });
