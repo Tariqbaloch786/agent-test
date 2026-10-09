@@ -17,7 +17,7 @@ function charge(overrides: Partial<Charge> = {}): Charge {
     id: 'ch_1',
     object: 'charge',
     amount: 1000,
-    amount_captured: 1000,
+    amount_captured: '1000',
     currency: 'usd',
     status: 'succeeded',
     captured: true,
@@ -81,12 +81,12 @@ describe('payment intent helpers', () => {
   });
 });
 
-describe('capturedTotal', () => {
-  it('sums the captured amounts in cents', () => {
-    expect(capturedTotal([charge({ amount_captured: 250 }), charge({ amount_captured: 750 })])).toBe(1000);
-    expect(capturedTotal([])).toBe(0);
+  describe('capturedTotal', () => {
+    it('sums the captured amounts in cents', () => {
+      expect(capturedTotal([charge({ amount_captured: '250' }), charge({ amount_captured: '750' })])).toBe(1000);
+      expect(capturedTotal([])).toBe(0);
+    });
   });
-});
 
 describe('removeCustomerDiscount', () => {
   it('deletes the discount of the customer', async () => {
