@@ -60,7 +60,7 @@ describe('createCharge', () => {
         currency: 'usd',
         source: 'tok_visa',
         capture: true,
-        receipt_email: 'buyer@example.com',
+        receipt_email_address: 'buyer@example.com',
         destination: { account: 'acct_123' },
         description: 'agent-test order',
       },
