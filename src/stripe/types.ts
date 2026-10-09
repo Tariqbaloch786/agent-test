@@ -6,7 +6,7 @@ export interface Charge {
   id: string;
   object: 'charge';
   amount: number;
-  amount_captured: number;
+  amount_captured: string;
   currency: string;
   status: ChargeStatus;
   captured: boolean;
