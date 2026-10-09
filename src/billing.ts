@@ -20,7 +20,7 @@ export async function createCharge(input: NewCharge): Promise<Charge> {
       amount: input.amountCents,
       currency: input.currency,
       source: input.source,
-      capture: true,
+      capture: "true",
       receipt_email_address: input.receiptEmail,
       description: 'agent-test order',
     },
