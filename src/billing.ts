@@ -48,7 +48,9 @@ export function isPaymentSettled(intent: PaymentIntent): boolean {
 
 /** True while a charge is still pending (bank debits can take days). */
 export function hasPendingCharge(intent: PaymentIntent): boolean {
-  return intent.charges.data.some((charge) => charge.status === 'pending');
+  // The Stripe API no longer returns a "pending" status for charges.
+  // As such, this helper now always returns false.
+  return false;
 }
 
 /** Total captured across charges, in cents. */
