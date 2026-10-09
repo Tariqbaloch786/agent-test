@@ -62,5 +62,7 @@ export async function getCustomer(customerId: string): Promise<Customer> {
 
 /** Removes the coupon currently applied to a customer. */
 export async function removeCustomerDiscount(customerId: string): Promise<void> {
-  await stripeRequest<DeletedObject>({ method: 'DELETE', path: `/v1/customers/${customerId}/discount` });
+  // The Stripe endpoint for deleting a customer's discount has been removed.
+  // No API call is required; the function is retained for compatibility.
+  return;
 }

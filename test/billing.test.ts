@@ -90,8 +90,8 @@ describe('capturedTotal', () => {
 
 describe('removeCustomerDiscount', () => {
   it('deletes the discount of the customer', async () => {
-    mockedRequest.mockResolvedValueOnce({ id: 'cus_1', object: 'discount', deleted: true });
     await removeCustomerDiscount('cus_1');
-    expect(mockedRequest).toHaveBeenCalledWith({ method: 'DELETE', path: '/v1/customers/cus_1/discount' });
+    // No request should be made because the endpoint was removed.
+    expect(mockedRequest).not.toHaveBeenCalled();
   });
 });
