@@ -42,7 +42,9 @@ export async function getPaymentIntent(paymentIntentId: string): Promise<Payment
 
 /** True once any charge created by the payment intent succeeded. */
 export function isPaymentSettled(intent: PaymentIntent): boolean {
-  return intent.charges.data.some((charge) => charge.status === 'succeeded');
+  // The `charges` list was removed from the PaymentIntent object. Settlement can now be
+  // inferred from the intent’s own status.
+  return intent.status === 'succeeded';
 }
 
 /** True while a charge is still pending (bank debits can take days). */

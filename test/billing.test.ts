@@ -33,7 +33,6 @@ function intent(charges: Charge[]): PaymentIntent {
     amount: 1000,
     currency: 'usd',
     status: 'succeeded',
-    charges: { object: 'list', data: charges, has_more: false, url: '/v1/charges?payment_intent=pi_1' },
   };
 }
 
@@ -69,15 +68,15 @@ describe('createCharge', () => {
 
 describe('payment intent helpers', () => {
   it('is settled when a charge succeeded', () => {
-    expect(isPaymentSettled(intent([charge({ status: 'failed' }), charge({ id: 'ch_2' })]))).toBe(true);
-    expect(isPaymentSettled(intent([charge({ status: 'failed' })]))).toBe(false);
-    expect(isPaymentSettled(intent([]))).toBe(false);
+    // Settlement is now based on the intent’s status.
+    expect(isPaymentSettled({ ...intent([]), status: 'succeeded' })).toBe(true);
+    expect(isPaymentSettled({ ...intent([]), status: 'requires_payment_method' })).toBe(false);
   });
 
   it('reports pending charges', () => {
     // The 'pending' status is no longer valid; hasPendingCharge should always return false.
-    expect(hasPendingCharge(intent([charge({ status: 'pending' as any })]))).toBe(false);
-    expect(hasPendingCharge(intent([charge()]))).toBe(false);
+    expect(hasPendingCharge({ ...intent([]), status: 'succeeded' })).toBe(false);
+    expect(hasPendingCharge({ ...intent([]), status: 'requires_payment_method' })).toBe(false);
   });
 });
 
