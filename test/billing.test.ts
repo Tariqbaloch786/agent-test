@@ -52,19 +52,19 @@ describe('createCharge', () => {
       destinationAccount: 'acct_123',
     });
     expect(result.id).toBe('ch_1');
-    expect(mockedRequest).toHaveBeenCalledWith({
-      method: 'POST',
-      path: '/v1/charges',
-      params: {
-        amount: 1000,
-        currency: 'usd',
-        source: 'tok_visa',
-        capture: true,
-        receipt_email_address: 'buyer@example.com',
-        destination: { account: 'acct_123' },
-        description: 'agent-test order',
-      },
-    });
+      expect(mockedRequest).toHaveBeenCalledWith({
+        method: 'POST',
+        path: '/v1/charges',
+        params: {
+          amount: 1000,
+          currency: 'usd',
+          source: 'tok_visa',
+          capture: "true",
+          receipt_email_address: 'buyer@example.com',
+          destination: { account: 'acct_123' },
+          description: 'agent-test order',
+        },
+      });
   });
 });
 

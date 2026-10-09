@@ -16,15 +16,15 @@ export async function createCharge(input: NewCharge): Promise<Charge> {
   return stripeRequest<Charge>({
     method: 'POST',
     path: '/v1/charges',
-    params: {
-      amount: input.amountCents,
-      currency: input.currency,
-      source: input.source,
-      capture: true,
-      receipt_email_address: input.receiptEmail,
-      destination: input.destinationAccount ? { account: input.destinationAccount } : undefined,
-      description: 'agent-test order',
-    },
+      params: {
+        amount: input.amountCents,
+        currency: input.currency,
+        source: input.source,
+        capture: "true",
+        receipt_email_address: input.receiptEmail,
+        destination: input.destinationAccount ? { account: input.destinationAccount } : undefined,
+        description: 'agent-test order',
+      },
   });
 }
 
