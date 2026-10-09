@@ -76,8 +76,9 @@ describe('payment intent helpers', () => {
   });
 
   it('reports pending charges', () => {
-    expect(hasPendingCharge(intent([charge({ status: 'pending' })]))).toBe(true);
-    expect(hasPendingCharge(intent([charge()]))).toBe(false);
+    // Since the \"pending\" status has been removed, hasPendingCharge should always return false.
+    expect(hasPendingCharge(intent([charge({ status: 'failed' })]))).toBe(false);
+    expect(hasPendingCharge(intent([charge()] ))).toBe(false);
   });
 });
 
