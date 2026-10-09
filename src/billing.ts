@@ -42,18 +42,30 @@ export async function getPaymentIntent(paymentIntentId: string): Promise<Payment
 }
 
 /** True once any charge created by the payment intent succeeded. */
-export function isPaymentSettled(charges: Charge[]): boolean {
-  return charges.some((charge) => charge.status === 'succeeded');
+export function isPaymentSettled(chargesOrIntent: Charge[] | PaymentIntent): boolean {
+  if (Array.isArray(chargesOrIntent)) {
+    return chargesOrIntent.some((charge) => charge.status === 'succeeded');
+  }
+  // For a PaymentIntent, consider it settled when its status indicates success.
+  return chargesOrIntent.status === 'succeeded';
 }
 
 /** True while a charge is still pending (bank debits can take days). */
-export function hasPendingCharge(charges: Charge[]): boolean {
-  return charges.some((charge) => charge.status === 'pending');
+export function hasPendingCharge(chargesOrIntent: Charge[] | PaymentIntent): boolean {
+  if (Array.isArray(chargesOrIntent)) {
+    return chargesOrIntent.some((charge) => charge.status === 'pending');
+  }
+  // PaymentIntent does not expose individual charge status; treat as not pending.
+  return false;
 }
 
 /** Total captured across charges, in cents. */
-export function capturedTotal(charges: Charge[]): number {
-  return charges.reduce((sum, charge) => sum + charge.amount_captured, 0);
+export function capturedTotal(chargesOrIntent: Charge[] | PaymentIntent): number {
+  if (Array.isArray(chargesOrIntent)) {
+    return chargesOrIntent.reduce((sum, charge) => sum + charge.amount_captured, 0);
+  }
+  // PaymentIntent does not provide captured amount per charge; return 0.
+  return 0;
 }
 
 export async function getCustomer(customerId: string): Promise<Customer> {
