@@ -43,7 +43,10 @@ export async function getPaymentIntent(paymentIntentId: string): Promise<Payment
 
 /** True once any charge created by the payment intent succeeded. */
 export function isPaymentSettled(intent: PaymentIntent): boolean {
-  return intent.charges.data.some((charge) => charge.status === 'succeeded');
+  // The `charges` list has been removed from the PaymentIntent object in the Stripe API.
+  // For backward compatibility we still check for a runtime `charges` property if present.
+  const charges = (intent as any).charges?.data;
+  return Array.isArray(charges) && charges.some((charge: any) => charge.status === 'succeeded');
 }
 
 /** True while a charge is still pending (bank debits can take days). */

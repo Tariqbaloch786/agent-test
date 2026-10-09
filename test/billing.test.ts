@@ -27,14 +27,17 @@ function charge(overrides: Partial<Charge> = {}): Charge {
 }
 
 function intent(charges: Charge[]): PaymentIntent {
-  return {
+  // Construct a PaymentIntent without the `charges` field in its type,
+  // then attach the `charges` property at runtime for the helper functions.
+  const pi: any = {
     id: 'pi_1',
     object: 'payment_intent',
     amount: 1000,
     currency: 'usd',
     status: 'succeeded',
-    charges: { object: 'list', data: charges, has_more: false, url: '/v1/charges?payment_intent=pi_1' },
   };
+  pi.charges = { object: 'list', data: charges, has_more: false, url: '/v1/charges?payment_intent=pi_1' };
+  return pi as PaymentIntent;
 }
 
 beforeEach(() => {
