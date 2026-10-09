@@ -90,8 +90,9 @@ describe('capturedTotal', () => {
 
 describe('removeCustomerDiscount', () => {
   it('deletes the discount of the customer', async () => {
-    mockedRequest.mockResolvedValueOnce({ id: 'cus_1', object: 'discount', deleted: true });
+    // The Stripe endpoint for deleting a customer's discount has been removed.
+    // The function now performs no operation, so no request should be made.
     await removeCustomerDiscount('cus_1');
-    expect(mockedRequest).toHaveBeenCalledWith({ method: 'DELETE', path: '/v1/customers/cus_1/discount' });
+    expect(mockedRequest).not.toHaveBeenCalled();
   });
 });
