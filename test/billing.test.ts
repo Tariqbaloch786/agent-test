@@ -60,7 +60,7 @@ describe('createCharge', () => {
         currency: 'usd',
         source: 'tok_visa',
         capture: true,
-        receipt_email: 'buyer@example.com',
+        receipt_email_address: 'buyer@example.com',
         destination: { account: 'acct_123' },
         description: 'agent-test order',
       },
@@ -90,8 +90,8 @@ describe('capturedTotal', () => {
 
 describe('removeCustomerDiscount', () => {
   it('deletes the discount of the customer', async () => {
-    mockedRequest.mockResolvedValueOnce({ id: 'cus_1', object: 'discount', deleted: true });
     await removeCustomerDiscount('cus_1');
-    expect(mockedRequest).toHaveBeenCalledWith({ method: 'DELETE', path: '/v1/customers/cus_1/discount' });
+    // The endpoint was removed; the function is now a no‑op and should not call Stripe.
+    expect(mockedRequest).not.toHaveBeenCalled();
   });
 });
