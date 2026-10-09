@@ -53,7 +53,8 @@ export function hasPendingCharge(intent: PaymentIntent): boolean {
 
 /** Total captured across charges, in cents. */
 export function capturedTotal(charges: Charge[]): number {
-  return charges.reduce((sum, charge) => sum + charge.amount_captured, 0);
+  // `amount_captured` is now a string; convert to number for summation.
+  return charges.reduce((sum, charge) => sum + Number(charge.amount_captured), 0);
 }
 
 export async function getCustomer(customerId: string): Promise<Customer> {
