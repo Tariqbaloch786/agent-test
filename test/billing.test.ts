@@ -1,97 +1,53 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import {
-  capturedTotal,
-  createCharge,
-  hasPendingCharge,
-  isPaymentSettled,
-  removeCustomerDiscount,
-} from '../src/billing.js';
-import { stripeRequest } from '../src/stripe/client.js';
-import type { Charge, PaymentIntent } from '../src/stripe/types.js';
+import { describe, expect, it } from 'vitest';
+import type Stripe from 'stripe';
+import { daysUntilRenewal, invoiceSubscriptionId, summarize } from '../src/billing.js';
 
-vi.mock('../src/stripe/client.js', () => ({ stripeRequest: vi.fn() }));
-const mockedRequest = vi.mocked(stripeRequest);
+// Objects shaped as the 2025-03-31.basil API returns them: the billing period lives on each
+// subscription item, and an invoice's subscription lives under parent.subscription_details.
+const subscription = {
+  id: 'sub_123',
+  object: 'subscription',
+  status: 'active',
+  items: {
+    object: 'list',
+    data: [{ id: 'si_1', object: 'subscription_item', current_period_start: 1_767_225_600, current_period_end: 1_769_904_000, price: { id: 'price_basic' } }],
+    has_more: false,
+    url: '/v1/subscription_items',
+  },
+} as unknown as Stripe.Subscription;
 
-function charge(overrides: Partial<Charge> = {}): Charge {
-  return {
-    id: 'ch_1',
-    object: 'charge',
-    amount: 1000,
-    amount_captured: 1000,
-    currency: 'usd',
-    status: 'succeeded',
-    captured: true,
-    receipt_email: null,
-    ...overrides,
-  };
-}
+const subscriptionInvoice = {
+  id: 'in_1',
+  object: 'invoice',
+  parent: { type: 'subscription_details', subscription_details: { subscription: 'sub_123', metadata: {} } },
+} as unknown as Stripe.Invoice;
 
-function intent(charges: Charge[]): PaymentIntent {
-  return {
-    id: 'pi_1',
-    object: 'payment_intent',
-    amount: 1000,
-    currency: 'usd',
-    status: 'succeeded',
-    charges: { object: 'list', data: charges, has_more: false, url: '/v1/charges?payment_intent=pi_1' },
-  };
-}
+const oneOffInvoice = { id: 'in_2', object: 'invoice', parent: null } as unknown as Stripe.Invoice;
 
-beforeEach(() => {
-  mockedRequest.mockReset();
-});
-
-describe('createCharge', () => {
-  it('posts a captured charge with the receipt email and destination account', async () => {
-    mockedRequest.mockResolvedValueOnce(charge());
-    const result = await createCharge({
-      amountCents: 1000,
-      currency: 'usd',
-      source: 'tok_visa',
-      receiptEmail: 'buyer@example.com',
-      destinationAccount: 'acct_123',
-    });
-    expect(result.id).toBe('ch_1');
-    expect(mockedRequest).toHaveBeenCalledWith({
-      method: 'POST',
-      path: '/v1/charges',
-      params: {
-        amount: 1000,
-        currency: 'usd',
-        source: 'tok_visa',
-        capture: true,
-        receipt_email: 'buyer@example.com',
-        destination: { account: 'acct_123' },
-        description: 'agent-test order',
-      },
-    });
+describe('summarize', () => {
+  it('reports the current period and the price of the subscription', () => {
+    const summary = summarize(subscription);
+    expect(summary.id).toBe('sub_123');
+    expect(summary.status).toBe('active');
+    expect(summary.priceId).toBe('price_basic');
+    expect(summary.periodStart.toISOString()).toBe('2026-01-01T00:00:00.000Z');
+    expect(summary.periodEnd.toISOString()).toBe('2026-02-01T00:00:00.000Z');
   });
 });
 
-describe('payment intent helpers', () => {
-  it('is settled when a charge succeeded', () => {
-    expect(isPaymentSettled(intent([charge({ status: 'failed' }), charge({ id: 'ch_2' })]))).toBe(true);
-    expect(isPaymentSettled(intent([charge({ status: 'failed' })]))).toBe(false);
-    expect(isPaymentSettled(intent([]))).toBe(false);
-  });
-
-  it('reports pending charges', () => {
-    expect(hasPendingCharge(intent([charge({ status: 'pending' })]))).toBe(true);
-    expect(hasPendingCharge(intent([charge()]))).toBe(false);
+describe('daysUntilRenewal', () => {
+  it('counts whole days until the period ends and never goes negative', () => {
+    expect(daysUntilRenewal(subscription, new Date('2026-01-20T00:00:00Z'))).toBe(12);
+    expect(daysUntilRenewal(subscription, new Date('2026-03-01T00:00:00Z'))).toBe(0);
   });
 });
 
-describe('capturedTotal', () => {
-  it('sums the captured amounts in cents', () => {
-    expect(capturedTotal([charge({ amount_captured: 250 }), charge({ amount_captured: 750 })])).toBe(1000);
-    expect(capturedTotal([])).toBe(0);
+describe('invoiceSubscriptionId', () => {
+  it('returns the subscription id of a subscription invoice', () => {
+    expect(invoiceSubscriptionId(subscriptionInvoice)).toBe('sub_123');
   });
-});
 
-describe('removeCustomerDiscount', () => {
-  it('deletes the discount of the customer', async () => {
-    mockedRequest.mockResolvedValueOnce({ id: 'cus_1', object: 'discount', deleted: true });
-    await removeCustomerDiscount('cus_1');
-    expect(mockedRequest).toHaveBeenCalledWith({ method: 'DELETE', path: '/v1/customers/cus_1/discount' });
+  it('returns null for a one-off invoice', () => {
+    expect(invoiceSubscriptionId(oneOffInvoice)).toBeNull();
   });
 });

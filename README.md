@@ -1,23 +1,15 @@
 # agent-test
 
-A small Express app that talks to Stripe with the **2022-08-01** API shape. It exists as a target
-for [API Update Agent](https://github.com/Tariqbaloch786): the agent watches Stripe's API, finds the
-lines here that a change affects, and opens a draft pull request with the fix, verified by this
-repository's own CI.
+Target repository for [API Update Agent](https://github.com/Tariqbaloch786/api-update-agent): a small billing module that talks to Stripe.
 
-What it uses from Stripe:
+The situation it models is a common one: the `stripe` SDK was bumped to 18.5.0, whose default API version is 2025-08-27.basil, but the code still reads shapes that the 2025-03-31.basil release removed. `src/billing.ts` reads `subscription.current_period_start` and `current_period_end`, which Basil moved onto each subscription item, and `invoice.subscription`, which Basil moved under `invoice.parent.subscription_details`. The tests in `test/` already use the Basil shapes, so on `main` the typecheck and the tests are red on purpose. A correct migration of `src/billing.ts` makes both green.
 
-- `POST /v1/charges` with `source`, `destination`, `receipt_email` and `capture: true`
-- `POST /v1/charges/{charge}/capture`
-- `GET /v1/payment_intents/{intent}` and the `charges` list on the payment intent
-- `charge.status` values `succeeded` / `pending` / `failed`, `charge.amount_captured` as a number
-- `DELETE /v1/customers/{customer}/discount`
+No `apiVersion` is pinned: the installed SDK decides the version, which is what the agent's version gate reads.
 
-```bash
+Pull request #10 on this repository is an earlier, synthetic test: its changes came from a pair of hand-written spec fixtures with one change of each type, built to exercise the pipeline, and several of them never happened in Stripe's API.
+
+```
 npm ci
 npm run typecheck
 npm test
-STRIPE_SECRET_KEY=sk_test_... npm run build && npm start
 ```
-
-CI (`.github/workflows/ci.yml`) runs typecheck and tests on every push to `main` and every pull request.
