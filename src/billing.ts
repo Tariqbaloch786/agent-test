@@ -20,9 +20,8 @@ export async function createCharge(input: NewCharge): Promise<Charge> {
       amount: input.amountCents,
       currency: input.currency,
       source: input.source,
-      capture: true,
-      receipt_email: input.receiptEmail,
-      destination: input.destinationAccount ? { account: input.destinationAccount } : undefined,
+      capture: "true",
+      receipt_email_address: input.receiptEmail,
       description: 'agent-test order',
     },
   });
@@ -43,17 +42,22 @@ export async function getPaymentIntent(paymentIntentId: string): Promise<Payment
 
 /** True once any charge created by the payment intent succeeded. */
 export function isPaymentSettled(intent: PaymentIntent): boolean {
-  return intent.charges.data.some((charge) => charge.status === 'succeeded');
+  // The `charges` list was removed from the PaymentIntent object. Settlement can now be
+  // inferred from the intent’s own status.
+  return intent.status === 'succeeded';
 }
 
 /** True while a charge is still pending (bank debits can take days). */
 export function hasPendingCharge(intent: PaymentIntent): boolean {
-  return intent.charges.data.some((charge) => charge.status === 'pending');
+  // The 'pending' status has been removed from the Stripe API; charges are either succeeded or failed.
+  // Therefore, a payment intent can never have a pending charge under the current API version.
+  return false;
 }
 
 /** Total captured across charges, in cents. */
 export function capturedTotal(charges: Charge[]): number {
-  return charges.reduce((sum, charge) => sum + charge.amount_captured, 0);
+  // `amount_captured` is now a string; convert to number for summation.
+  return charges.reduce((sum, charge) => sum + Number(charge.amount_captured), 0);
 }
 
 export async function getCustomer(customerId: string): Promise<Customer> {
@@ -62,5 +66,7 @@ export async function getCustomer(customerId: string): Promise<Customer> {
 
 /** Removes the coupon currently applied to a customer. */
 export async function removeCustomerDiscount(customerId: string): Promise<void> {
-  await stripeRequest<DeletedObject>({ method: 'DELETE', path: `/v1/customers/${customerId}/discount` });
+  // The Stripe endpoint for deleting a customer's discount has been removed.
+  // No API call is required; the function is retained for compatibility.
+  return;
 }

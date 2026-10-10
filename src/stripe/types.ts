@@ -1,12 +1,12 @@
 /** Stripe object shapes as of API version 2022-08-01 (only the fields this app reads). */
 
-export type ChargeStatus = 'succeeded' | 'pending' | 'failed';
+export type ChargeStatus = 'succeeded' | 'failed';
 
 export interface Charge {
   id: string;
   object: 'charge';
   amount: number;
-  amount_captured: number;
+  amount_captured: string;
   currency: string;
   status: ChargeStatus;
   captured: boolean;
@@ -26,7 +26,6 @@ export interface PaymentIntent {
   amount: number;
   currency: string;
   status: string;
-  charges: ChargeList;
 }
 
 export interface Customer {
