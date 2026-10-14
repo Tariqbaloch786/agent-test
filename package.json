@@ -1,0 +1,24 @@
+{
+  "name": "openai-agent-test",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Small assistant module on the openai Node library v3 (Configuration + OpenAIApi, createChatCompletion, response.data). Target repository for API Update Agent: the v3 to v4 migration.",
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:ci": "vitest run --reporter=default --reporter=github-actions",
+    "build": "tsc -p tsconfig.build.json"
+  },
+  "dependencies": {
+    "openai": "3.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "6.0.3",
+    "vitest": "^5.0.3"
+  }
+}
