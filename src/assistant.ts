@@ -23,16 +23,20 @@ export function newestModelId(models: ModelLike[]): string | null {
 
 /** Asks the model one question and returns its answer. */
 export async function answer(question: string): Promise<string> {
-  const response = await openai.createChatCompletion({
+  // In OpenAI SDK v4 the chat completion endpoint is accessed via `openai.chat.completions.create`.
+  const response = await openai.chat.completions.create({
     model: 'gpt-4o-mini',
     messages: [{ role: 'user', content: question }],
     max_tokens: 200,
   });
-  return extractAnswer(response.data);
+  // The v4 SDK returns the completion object directly (no `.data` wrapper).
+  return extractAnswer(response);
 }
 
 /** The ids of every model the key can use, newest first. */
 export async function listModelIds(): Promise<string[]> {
-  const response = await openai.listModels();
-  return [...response.data.data].sort((a, b) => b.created - a.created).map((model) => model.id);
+  // In SDK v4 model listing is performed via `openai.models.list()`.
+  const response = await openai.models.list();
+  // The response contains a `data` array of models (no nested `data` field).
+  return [...response.data].sort((a, b) => b.created - a.created).map((model) => model.id);
 }
