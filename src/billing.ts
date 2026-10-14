@@ -15,8 +15,13 @@ export function summarize(subscription: Stripe.Subscription): SubscriptionSummar
     id: subscription.id,
     status: subscription.status,
     priceId: subscription.items.data[0]?.price.id ?? null,
-    periodStart: new Date(subscription.current_period_start * 1000),
-    periodEnd: new Date(subscription.current_period_end * 1000),
+    // Use the first item's period timestamps now that the top‑level fields are removed.
+    periodStart: new Date(
+      (subscription.items.data[0]?.current_period_start ?? 0) * 1000,
+    ),
+    periodEnd: new Date(
+      (subscription.items.data[0]?.current_period_end ?? 0) * 1000,
+    ),
   };
 }
 
@@ -33,7 +38,7 @@ export function daysUntilRenewal(subscription: Stripe.Subscription, now = new Da
 
 /** The subscription an invoice belongs to, as an id, or null for a one-off invoice. */
 export function invoiceSubscriptionId(invoice: Stripe.Invoice): string | null {
-  const subscription = invoice.subscription;
+  const subscription = invoice.parent?.subscription_details?.subscription;
   if (!subscription) return null;
   return typeof subscription === 'string' ? subscription : subscription.id;
 }
