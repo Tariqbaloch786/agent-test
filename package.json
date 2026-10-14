@@ -14,7 +14,7 @@
     "build": "tsc -p tsconfig.build.json"
   },
   "dependencies": {
-    "openai": "3.3.0"
+    "openai": "4.0.0"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
