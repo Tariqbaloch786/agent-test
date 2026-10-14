@@ -14,7 +14,7 @@
     "build": "tsc -p tsconfig.build.json"
   },
   "dependencies": {
-    "stripe": "18.5.0"
+    "stripe": "17.5.0"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
