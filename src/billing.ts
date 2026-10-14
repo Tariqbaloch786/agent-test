@@ -15,8 +15,12 @@ export function summarize(subscription: Stripe.Subscription): SubscriptionSummar
     id: subscription.id,
     status: subscription.status,
     priceId: subscription.items.data[0]?.price.id ?? null,
-    periodStart: new Date(subscription.current_period_start * 1000),
-    periodEnd: new Date(subscription.current_period_end * 1000),
+    periodStart: new Date(
+      Number(subscription.items.data[0]?.current_period_start ?? 0) * 1000,
+    ),
+    periodEnd: new Date(
+      Number(subscription.items.data[0]?.current_period_end ?? 0) * 1000,
+    ),
   };
 }
 
@@ -27,7 +31,7 @@ export async function describeSubscription(subscriptionId: string): Promise<Subs
 
 /** Whole days until the subscription renews, never negative. */
 export function daysUntilRenewal(subscription: Stripe.Subscription, now = new Date()): number {
-  const end = subscription.current_period_end * 1000;
+  const end = Number(subscription.items.data[0]?.current_period_end ?? 0) * 1000;
   return Math.max(0, Math.ceil((end - now.getTime()) / 86_400_000));
 }
 
