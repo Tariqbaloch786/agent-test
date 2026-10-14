@@ -5,13 +5,13 @@ const API_KEY_SID = process.env.TWILIO_API_KEY_SID ?? 'SKxxxxxxxxxxxxxxxxxxxxxxx
 const API_KEY_SECRET = process.env.TWILIO_API_KEY_SECRET ?? 'placeholder-secret-placeholder-secret';
 
 const AccessToken = twilio.jwt.AccessToken;
-const IpMessagingGrant = AccessToken.IpMessagingGrant;
+const ChatGrant = AccessToken.ChatGrant;
 
 /** A short-lived token that lets one chat user join the given messaging service. */
 export function chatToken(identity: string, serviceSid: string, ttlSeconds = 3600): string {
   const token = new AccessToken(ACCOUNT_SID, API_KEY_SID, API_KEY_SECRET, { ttl: ttlSeconds });
   token.identity = identity;
-  token.addGrant(new IpMessagingGrant({ serviceSid }));
+  token.addGrant(new ChatGrant({ serviceSid }));
   return token.toJwt();
 }
 
