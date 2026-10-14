@@ -14,7 +14,7 @@
     "build": "tsc -p tsconfig.build.json"
   },
   "dependencies": {
-    "twilio": "3.84.1"
+    "twilio": "4.23.0"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",

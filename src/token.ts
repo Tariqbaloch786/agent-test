@@ -9,8 +9,10 @@ const ChatGrant = AccessToken.ChatGrant;
 
 /** A short-lived token that lets one chat user join the given messaging service. */
 export function chatToken(identity: string, serviceSid: string, ttlSeconds = 3600): string {
-  const token = new AccessToken(ACCOUNT_SID, API_KEY_SID, API_KEY_SECRET, { ttl: ttlSeconds });
-  token.identity = identity;
+  const token = new AccessToken(ACCOUNT_SID, API_KEY_SID, API_KEY_SECRET, {
+    ttl: ttlSeconds,
+    identity,
+  });
   token.addGrant(new ChatGrant({ serviceSid }));
   return token.toJwt();
 }

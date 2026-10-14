@@ -4,8 +4,8 @@ import twilio from 'twilio';
 export function greeting(name: string): string {
   const response = new twilio.twiml.VoiceResponse();
   const say = response.say({ voice: 'alice' }, 'Welcome back, ');
-  say.ssmlEmphasis({ level: 'strong' }, name);
-  say.ssmlBreak({ strength: 'medium' });
+  say.emphasis({ level: 'strong' }, name);
+  say.break({ strength: 'medium' });
   response.say({ voice: 'alice' }, 'How can we help today?');
   return response.toString();
 }
