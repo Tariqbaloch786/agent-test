@@ -33,7 +33,7 @@ export function daysUntilRenewal(subscription: Stripe.Subscription, now = new Da
 
 /** The subscription an invoice belongs to, as an id, or null for a one-off invoice. */
 export function invoiceSubscriptionId(invoice: Stripe.Invoice): string | null {
-  const subscription = invoice.subscription;
+  const subscription = invoice.parent?.subscription_details?.subscription;
   if (!subscription) return null;
   return typeof subscription === 'string' ? subscription : subscription.id;
 }
