@@ -1,0 +1,24 @@
+{
+  "name": "twilio-agent-test",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Small voice and chat module on the twilio Node library v3 (SSML helpers on Say, AccessToken without identity in the options, IpMessagingGrant). Target repository for API Update Agent: the v3 to v4 migration.",
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:ci": "vitest run --reporter=default --reporter=github-actions",
+    "build": "tsc -p tsconfig.build.json"
+  },
+  "dependencies": {
+    "twilio": "3.84.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "6.0.3",
+    "vitest": "^5.0.3"
+  }
+}
