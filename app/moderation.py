@@ -2,8 +2,9 @@
 
 import openai
 
+client = openai.OpenAI()
 
 def is_flagged(text: str) -> bool:
     """Whether the moderation endpoint flags the text."""
-    result = openai.Moderation.create(input=text)
-    return bool(result["results"][0]["flagged"])
+    result = client.moderations.create(input=text)
+    return result.results[0].flagged
